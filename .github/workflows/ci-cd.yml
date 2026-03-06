@@ -9,6 +9,17 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: order_service
+          MYSQL_USER: order_user
+          MYSQL_PASSWORD: order_pass
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
     - name: Checkout code
@@ -32,6 +43,10 @@ jobs:
 
     - name: Run tests
       run: mvn test
+      env:
+        SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/order_service
+        SPRING_DATASOURCE_USERNAME: order_user
+        SPRING_DATASOURCE_PASSWORD: order_pass
 
     - name: Build Docker image
       run: docker build -t orderservice:${{ github.sha }} .
