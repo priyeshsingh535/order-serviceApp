@@ -36,16 +36,17 @@ jobs:
     - name: Build Docker image
       run: docker build -t orderservice:${{ github.sha }} .
 
-    - name: Log in to Docker Hub
+    - name: Log in to GitHub Container Registry
       uses: docker/login-action@v3
       with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Push Docker image
       run: |
-        docker tag orderservice:${{ github.sha }} ${{ secrets.DOCKER_USERNAME }}/orderservice:${{ github.sha }}
-        docker push ${{ secrets.DOCKER_USERNAME }}/orderservice:${{ github.sha }}
+        docker tag orderservice:${{ github.sha }} ghcr.io/${{ github.repository }}/orderservice:${{ github.sha }}
+        docker push ghcr.io/${{ github.repository }}/orderservice:${{ github.sha }}
 
   deploy:
     runs-on: ubuntu-latest
@@ -63,5 +64,5 @@ jobs:
         manifests: |
           k8s/order-deployment.yaml
           k8s/order-service.yaml
-        images: ${{ secrets.DOCKER_USERNAME }}/orderservice:${{ github.sha }}
+        images: ghcr.io/${{ github.repository }}/orderservice:${{ github.sha }}
         pull-images: true
