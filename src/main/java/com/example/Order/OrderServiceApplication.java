@@ -13,6 +13,7 @@ public class OrderServiceApplication {
 	public static void main(String[] args) {
 		
 		log.info("Starting OrderService Application...");
+		log.info("Instance is getting started for orderService");
 		SpringApplication.run(OrderServiceApplication.class, args);
 	}
 
